@@ -74,7 +74,7 @@ Copy public IPV4 Address ,paste in browser➡️ 172-31-47-91:8080 ➡️ copy p
 <br> 👉`[root@JENKINS-SERVER maven]# ls`
 <br> O/P = bin&nbsp;&nbsp;&nbsp;&nbsp; boot&nbsp;&nbsp;&nbsp;&nbsp; conf&nbsp;&nbsp;&nbsp;&nbsp; lib&nbsp;&nbsp;&nbsp;&nbsp; LICENSE&nbsp;&nbsp;&nbsp;&nbsp; NOTICE&nbsp;&nbsp;&nbsp;&nbsp; README.txt
 <br> 👉`[root@JENKINS-SERVER maven]# cd bin/`
-<br> 👉`[root@JENKINS-SERVER bin]# ./mvn -v` (O/P = maven & java has installed)
+<br> 👉`[root@JENKINS-SERVER bin]# ./mvn -v` (O/P = maven & java has installed 😃)
 <br> 👉`[root@JENKINS-SERVER bin]# cd ..`
 <br> 👉`[root@JENKINS-SERVER maven]# ./mvn -v`
 <br> bash:&nbsp;&nbsp;&nbsp;&nbsp; ./mvn:&nbsp;&nbsp;&nbsp;&nbsp; No such file or directory 😨
@@ -102,3 +102,21 @@ Copy public IPV4 Address ,paste in browser➡️ 172-31-47-91:8080 ➡️ copy p
 <br> 👉`[root@JENKINS-SERVER ~]# mvn -v` &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Now i can run maven cmd anywhere from the server)
 <br> 😏Till here we have setup the maven we have configured the maven on the server, on the same server on which we have our Jenkins.
 <br> 😏Now we need to install the Maven plugin on the Jenkins & then we need to configure the Jenkins for the Maven
+## 🔹 3️⃣ INSTALL MAVEN PLUGIN AND CONFIGURE JENKINS FOR MAVEN 🔹
+**` Go to Aws `** ➡️ copy public IPV4 address:8080 = paste in browser 
+<br> **` Go to Manage Jenkins `** ➡️ plugins ➡️ Available Plugins (search=✔️maven Integration) Install without restart 
+<br> &nbsp;&nbsp;&nbsp;&nbsp;● Meaning=It will Install dependencies,& plugin has been installed to Maven
+<br> **` Go to Manage Jenkins `** ➡️ Tools 
+<br> &nbsp;&nbsp;&nbsp;&nbsp;● JDK = Add JDK = (Name=java11) = (JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.19.0.7-1.amzn2.0.1.x86_64)copythislinefrom above
+<br> &nbsp;&nbsp;&nbsp;&nbsp;● Maven = Add Maven = (Name=maven) = untick [ ] install automatically = MAVEN_HOME=/opt/maven = Apply = Save
+<br> **` Go to Manage Jenkins `** ➡️ plugins ➡️ Installed Plugins ➡️ (search=github)
+<br> &nbsp;&nbsp;&nbsp;&nbsp;● Disable = Github Branch Source Plugin
+<br> &nbsp;&nbsp;&nbsp;&nbsp;● Enable = Github Plugin = click on (Restart Once No Jobs Are Running)
+<br> **Go to terminal** 
+<br> 👉`[root@JENKINS-SERVER ~]# yum install git`
+<br> **Go to Jenkins GUI & Login again** 
+<br> 😏 Now we need to create one test project & we want to test the build 
+<br> + New item ➡️ Name = Test-Maven-Build ➡️ Maven project = ok ➡️ Description = Test Maven Build ➡️ Source Code Management = Git ➡️ Repository URL = https://github.com/Venkat474/registration-app.git ➡️ Credentials = none ➡️ Branch Specifier = [*/main] Always go & check this in ur Github ➡️ Build = (Root POM = pom.xml) = (Goals and options = clean install) ➡️ Apply ➡️ Save  <br> **Click on Build Now** &nbsp;&nbsp;&nbsp;&nbsp;(O/P=Success Here it download all dependencies for build)
+<br> Dashboard > Test-Maven-Build = Workspace =webapp = target (Here we see `webapp.war` this is the final build file) 
+## 🔹 4️⃣ SETUP DOCKER-HOST
+Till now we have configured the Jenkins 
