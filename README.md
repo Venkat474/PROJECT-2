@@ -123,22 +123,59 @@ Till now we have configured the Jenkins & the maven , now we need to create the 
 <br> **` Go to Aws `** *[ I will create seperate EC2 instance to host the docker ]* 
 <br> 👉 EC2 ➡️ Launch Instance ➡️ Name = [Docker-Host] ➡️ AMI=Ubuntu(QuickStart) ➡️ Ubuntu Server 22.04 LTS (HVM), SSD Volume Type (Free Tier Eligible) ➡️ Architecture = 64-bit(x86) ➡️ Instance type = t2.micro(Free Tier Eligible) <br> ➡️ Key pair = Proceed without a key pair[Bcoz i am going to enable the username & password authentication for this Docker Host,bcoz we are going to configure the username & password in the Jenkins] 
 <br> 🧠 Break it into parts
-<br> 🔹 `Key Pair`
+<br> ☺️ `Key Pair`
 <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Normally used for secure SSH login
 <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Uses a private key (.pem) instead of a password
-<br> 🔹 Proceed without a key pair
+<br> ☺️ Proceed without a key pair
 <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You are skipping key-based authentication
 <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You will enable username & password login manually later
 <br> 🔐 Key pair = Door with a smart key
 <br> 🔑 Username & password = Door with normal lock
 <br>➡️ Network Settings = Firewall = create security group = ✔️ Allow SSH traffic from 0.0.0.0/0 ➡️ Configure storage = 1x8 GiB gp2 Root Volume = Launch Instance 
 <br> Select [Docker-Host] & click Connect = Connect using EC2 Instance Connect = Connect 
-<br> 👉`[ubuntu@ip-172-31-32-22:~]$ cd /etc/ssh
-<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ ls   { open the file sshd_config } 
-<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ sudo nano sshd_config
+<br> 👉`[ubuntu@ip-172-31-32-22:~]$ cd /etc/ssh`
+<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ ls`   { open the file sshd_config } 
+<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ sudo nano sshd_config`
 <br> Before = PasswordAuthentication no , After = PasswordAuthentication yes { save and close the file }
-<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ sudo systemctl restart sshd 
-<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ sudo passwd ubuntu
+<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ sudo systemctl restart sshd` 
+<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ sudo passwd ubuntu`
 <br> Go to Public IP copy Public IP Address  **` Go to MobaXtrem `**
 <br> 👉 Session ➡️ SSH ➡️ Remote host (Paste here IPV4) ➡️ ✔️specify username = ubuntu , Port 22 
 <br> Advanced SSH Settings = ✔️ use private key = ______(Provide private key which is in downloads) ➡️ ✔️x11 = Forwarding ➡️ ✔️Compression ➡️ Remote environment = interactive shell ➡️ SSH-browser-type = SFTP protocol = OK = put the password = No .
+<br> 👉`[ubuntu@ip-172-31-32-22:~]$ sudo apt update && sudo apt-get update` 
+<br> 👉`[ubuntu@ip-172-31-32-22:~]$ sudo apt install docker.io`
+<br> 👉`[ubuntu@ip-172-31-32-22:~]$ sudo usermod -aG docker ubuntu`
+<br> Now i need to change the hostname of my Docker host 
+<br> 👉`[ubuntu@ip-172-31-32-22:~]$ sudo hostname Docker-Host`
+<br> 👉`[ubuntu@ip-172-31-32-22:~]$ sudo nano /etc/hostname`
+<br> remove everything just type the hostname `Docker-Host`
+<br> 👉`[ubuntu@ip-172-31-32-22:~]$ sudo init 6 [Press R]`
+### ALLOW PORT 8086 IN [Docker-Host]
+**` Go to Aws `** ➡️EC2➡️ security ➡️ securitygroups ➡️ Inbound rules ➡️ Edit Inbound Rules➡️ Add rule ➡️ portrange=8086 ➡️ source=AnywhereIPV4 ➡️ Type=customTCP ➡️ SaveRules
+## 🔹 5️⃣ INTEGRATING DOCKER HOST WITH JENKINS 🔹
+Now i will provide the full access on the /opt directory to the Ubuntu user
+<br> 👉`[ubuntu@Docker-Host:~]$ sudo chown -R ubuntu:ubuntu /opt`
+<br> 👉`[ubuntu@Docker-Host:~]$ cd /opt`
+<br> 👉`[ubuntu@Docker-Host:/opt]$ mkdir Docker`
+<br> 👉`[ubuntu@Docker-Host:/opt]$ sudo chown -R ubuntu:ubuntu /opt/Docker` { this directory we use to save the docker file & we will push the image from the jenkins to this folder , so our user Ubuntu should have all the rights on this directory }
+<br> **` Go to Jenkins GUI & Login again `** 
+<br> **` Go to Manage Jenkins `** ➡️ System = Publish over SSH { under SSH Servers remove that previously added server if there } ➡️ under SSH Servers = ADD = [Name=Docker-Host] = [Hostname=provide the public IP address of Docker-Host] = [Username = ubuntu] = click on Advanced ✔️ Use password authentication, or use a different key [password=________] = Apply = Test configuration { O/P = Success } = Save 
+### Create Jenkins Job to Build and Copy Artifacts to Docker Server
+**` Go to Dashboard `** ➡️ `+ Add item` ➡️ Name = Build-Copy-Deploy-To-Docker-Host ➡️ Maven Project ➡️ Ok
+<br> Description = Build , Copy and Deploy to Docker Host ➡️ Source Code Management = git 
+<br> ➡️ Repository Url = https://github.com/Venkat474/registration-app.git ➡️ Branch = `*/main` 
+<br> ➡️ Build Triggers = Poll SCM = Schedule{ * * * * * } it means every minute it will check the repository & if there is any change on this repository it will trigger the build and deploy process & the main thing about the schedule is it will only check for the provided github repo(registration-app) not entire github 
+<br> Build ➡️ Root POM = pom.xml ➡️ Goals and options = clean install 
+<br> Post-build Actions ➡️ Add post-build action ➡️ select Send build artifacts over SSH  ➡️ under Transfers = {Source files = `webapp/target/*.war`} = {Removemprefix = `webapp/target`} = {Remote directory=`//opt//Docker`} // is important then only it will copy the artifact to the //opt//Docker directory if we give single / it will copy the articats to the home directory of the user which is Ubuntu = Apply = Save
+<br> Now it starts the build automatcally {O/P=Success}
+<br> Dashboard > Build-Copy-Deploy-To-Docker-Host = Workspace = webapp = target (Here we see `webapp.war` this is the final build file)
+<br> **` Go to MobaXtrem `** 
+<br> 👉`[ubuntu@Docker-Host:/opt]$ cd Docker/`
+<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ ls` {u can see webapp.war, So the artifact has been pushed from Jenkins to the docker host }
+### Create Docker File at Docker Host to Automate Deployment 
+**` Go to MobaXtrem `** 
+<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ nano Dockerfile`
+<br> `FROM tomcat:latest`
+<br> `RUN cp -R /usr/local/tomcat/webapps.dist/* /usr/local/tomcat/webapps`
+<br> `COPY ./*.war /usr/local/tomcat/webapps`
+<br> 
