@@ -120,5 +120,25 @@ Copy public IPV4 Address ,paste in browser➡️ 172-31-47-91:8080 ➡️ copy p
 <br> Dashboard > Test-Maven-Build = Workspace =webapp = target (Here we see `webapp.war` this is the final build file) 
 ## 🔹 4️⃣ SETUP DOCKER-HOST
 Till now we have configured the Jenkins & the maven , now we need to create the docker host & we need to integrate the docker with the jenkins 
-**` Go to Aws `** *[ I will create seperate EC2 instance to host the docker ]* 
-<br> 👉 EC2 ➡️ Launch Instance ➡️ Name = [Docker-Host] ➡️ AMI=Ubuntu(QuickStart) ➡️ Ubuntu Server 22.04 LTS (HVM), SSD Volume Type (Free Tier Eligible) ➡️ Architecture = 64-bit(x86) ➡️ Instance type = t2.micro(Free Tier Eligible) ➡️ Key pair = Proceed without a key pair[Bcoz i am going to enable the username & password authentication for this Docker Host,bcoz we are going to configure the username & password in the Jenkins] ➡️ Network Settings = Firewall = create security group = ✔️ Allow SSH traffic from 0.0.0.0/0 ➡️ Configure storage = 1x8 GiB gp2 Root Volume = Launch Instance
+<br> **` Go to Aws `** *[ I will create seperate EC2 instance to host the docker ]* 
+<br> 👉 EC2 ➡️ Launch Instance ➡️ Name = [Docker-Host] ➡️ AMI=Ubuntu(QuickStart) ➡️ Ubuntu Server 22.04 LTS (HVM), SSD Volume Type (Free Tier Eligible) ➡️ Architecture = 64-bit(x86) ➡️ Instance type = t2.micro(Free Tier Eligible) <br> ➡️ Key pair = Proceed without a key pair[Bcoz i am going to enable the username & password authentication for this Docker Host,bcoz we are going to configure the username & password in the Jenkins] 
+<br> 🧠 Break it into parts
+<br> 🔹 `Key Pair`
+<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Normally used for secure SSH login
+<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Uses a private key (.pem) instead of a password
+<br> 🔹 Proceed without a key pair
+<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You are skipping key-based authentication
+<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You will enable username & password login manually later
+<br> 🔐 Key pair = Door with a smart key
+<br> 🔑 Username & password = Door with normal lock
+<br>➡️ Network Settings = Firewall = create security group = ✔️ Allow SSH traffic from 0.0.0.0/0 ➡️ Configure storage = 1x8 GiB gp2 Root Volume = Launch Instance 
+<br> Select [Docker-Host] & click Connect = Connect using EC2 Instance Connect = Connect 
+<br> 👉`[ubuntu@ip-172-31-32-22:~]$ cd /etc/ssh
+<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ ls   { open the file sshd_config } 
+<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ sudo nano sshd_config
+<br> Before = PasswordAuthentication no , After = PasswordAuthentication yes { save and close the file }
+<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ sudo systemctl restart sshd 
+<br> 👉`[ubuntu@ip-172-31-32-22:/etc/ssh]$ sudo passwd ubuntu
+<br> Go to Public IP copy Public IP Address  **` Go to MobaXtrem `**
+<br> 👉 Session ➡️ SSH ➡️ Remote host (Paste here IPV4) ➡️ ✔️specify username = ubuntu , Port 22 
+<br> Advanced SSH Settings = ✔️ use private key = ______(Provide private key which is in downloads) ➡️ ✔️x11 = Forwarding ➡️ ✔️Compression ➡️ Remote environment = interactive shell ➡️ SSH-browser-type = SFTP protocol = OK = put the password = No .
