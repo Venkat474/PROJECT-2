@@ -186,12 +186,29 @@ Now i will provide the full access on the /opt directory to the Ubuntu user
 <br> Dockerfile &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; webapp.war
 <br> 😏 Now i will build the image of docker file
 <br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ docker build -t webapp:v1 .`
-<br> ![Project Image](PHOTOS/project2.1PNG)
-<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ docker run -d --name registerapp -p 8080:8080 webapp:v1`
-<br> 😀 Meaning [ Runs the webapp container in background and exposes it on port 8080 ] 
+<br> ![Project Image](PHOTOS/project2.1.PNG)
+<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ docker run -d --name registerapp -p 8086:8080 webapp:v1`
+<br> 😀 Meaning &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ Runs the webapp container in background and exposes it on port 8080 ] 
 - docker run        → Create and start a container
 - -d                → Run in background
 - --name registerapp→ Container name
 - -p 8080:8080      → Map host port to container port
 - webapp:v1         → Image name and version
 
+<br> **` Go to EC2`** [copy Public IPV4 of Docker-Host ]
+<br> open in new tab as 13.232.227.185:8086 [ This is our home page of Apache Tomcat]
+<br> 13.232.227.185:8086/webapp [This is our application running]
+### Automate Build & Deployment on Docker Container
+**` Go to EC2`** Dashboard ➡️ Build-Copy-Deploy-To-Docker-Host ➡️ configure 
+<br> ➡️ Post-build Actions  [I am going to add the command in {Exec command} section to build the image & to run the container] 
+<br> `docker build -t webapp:v1 .`  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   [Builds a Docker image named webapp:v1 from the current folder] 
+<br> `docker stop registerapp` &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;        [Stops the running registerapp container]
+<br> `docker rm registerapp` &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          [Deletes the registerapp container]     
+<br> `docker run -d --name registerapp -p 8086:8080 webapp:v1` &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    [this will run the container using that image]
+<br> In line 4 there would be 1 problem bcoz we are always having one conatiner with the register app running on our docker host & each time this job runs it will create the app container with the same app & there cannot be the same name with the multiple containers so deploy will fail whenever job will fail so to overcome this problem with the execution of commands i will add two more commands above the this. [ Apply & Save ] 
+### Verify the CI/CD by Doing Test Change on Github
+To verify the CI/CD Pipeline i will go to my Github repository [https://github.com/Venkat474/registration-app] at down wards it has README file edit it = write in 4th line `Test11` now go to tomcat dashboard close this app = Go to jenkins dashboard here job will trigger within a minute 
+<br> **` Go to EC2`** [ copy Public IPV4 of Docker-Host ]
+<br> open in new tab as 13.232.227.185:8086 [ This is our home page of Apache Tomcat ]
+<br> 13.232.227.185:8086/webapp [ This is our application running ] 
+<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ docker ps`
