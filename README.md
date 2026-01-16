@@ -181,8 +181,17 @@ Now i will provide the full access on the /opt directory to the Ubuntu user
 - **Meaning** 👉 This line tells Docker to use the latest Tomcat server image as the base for creating our container.
 - 👉 This line copies the default Tomcat applications into the active webapps folder so Tomcat can run properly.
 - 👉 This line copies your WAR file (Java web application) into Tomcat so it gets deployed automatically.
+
 <br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ ls`
 <br> Dockerfile &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; webapp.war
-<br> Now i will build the image of docker file
+<br> 😏 Now i will build the image of docker file
 <br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ docker build -t webapp:v1 .`
-<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ docker images`
+<br> ![Project Image](PHOTOS/project2.1PNG)
+<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ docker run -d --name registerapp -p 8080:8080 webapp:v1`
+<br> 😀 Meaning [ Runs the webapp container in background and exposes it on port 8080 ] 
+- docker run        → Create and start a container
+- -d                → Run in background
+- --name registerapp→ Container name
+- -p 8080:8080      → Map host port to container port
+- webapp:v1         → Image name and version
+
