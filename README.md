@@ -175,7 +175,14 @@ Now i will provide the full access on the /opt directory to the Ubuntu user
 ### Create Docker File at Docker Host to Automate Deployment 
 **` Go to MobaXtrem `** 
 <br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ nano Dockerfile`
-<br> `FROM tomcat:latest`
+<br> `FROM tomcat:latest` 
 <br> `RUN cp -R /usr/local/tomcat/webapps.dist/* /usr/local/tomcat/webapps`
-<br> `COPY ./*.war /usr/local/tomcat/webapps`
-<br> 
+<br> `COPY ./*.war /usr/local/tomcat/webapps` &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [save and exit]
+- **Meaning** 👉 This line tells Docker to use the latest Tomcat server image as the base for creating our container.
+- 👉 This line copies the default Tomcat applications into the active webapps folder so Tomcat can run properly.
+- 👉 This line copies your WAR file (Java web application) into Tomcat so it gets deployed automatically.
+<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ ls`
+<br> Dockerfile &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; webapp.war
+<br> Now i will build the image of docker file
+<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ docker build -t webapp:v1 .`
+<br> 👉`[ubuntu@Docker-Host:/opt/Docker]$ docker images`
